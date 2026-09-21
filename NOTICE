@@ -1,9 +1,13 @@
 ComfyUI Model Hub
 
+This project is distributed under the GNU General Public License,
+version 3 only (GPL-3.0-only). See LICENSE.
+
 The dependency installation framework in prestartup_script.py and
 comfyui_model_hub/runtime/ is adapted from ComfyUI-HakuImg by licyk:
 https://github.com/licyk/ComfyUI-HakuImg
-Licensed under the Apache License, Version 2.0 (see LICENSE).
+The original framework is licensed under the Apache License, Version 2.0
+(see LICENSES/Apache-2.0.txt). Its original license and attribution are retained.
 
 Changes include project naming, corrected requirements path resolution,
 optional automatic installation, and scoped cleanup of imported modules.

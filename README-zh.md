@@ -90,4 +90,4 @@ ty 默认从相邻的 `../ComfyUI` 解析宿主接口；不同目录布局请用
 
 集成测试运行真实 sd-model-hub 发行包、aiohttp 代理及本地下载源，模型和数据放在临时目录。浏览器测试使用真实 Chromium 和 Hub 页面，以及模拟 ComfyUI 扩展注册接口的小型宿主，不代表完整 ComfyUI 前端或 GPU 工作流验证。
 
-Apache-2.0，复制来源及修改说明见 [NOTICE](NOTICE)。
+本项目采用 [GPL-3.0-only](LICENSE) 协议。复制的依赖安装框架保留原始 [Apache-2.0 许可证](LICENSES/Apache-2.0.txt)，来源及修改说明见 [NOTICE](NOTICE)。
