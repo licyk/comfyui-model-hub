@@ -21,7 +21,7 @@ git clone https://github.com/licyk/comfyui-model-hub.git custom_nodes/comfyui-mo
 
 Restart ComfyUI and refresh the browser. The prestartup script automatically installs missing/incompatible dependencies using ComfyUI's own Python interpreter.
 
-Requires Python 3.10+, ComfyUI's V3 `ComfyExtension` and `get_system_user_directory()` APIs, and a frontend supporting `actionBarButtons`. The source baseline is ComfyUI 0.35.0 / frontend 1.55.9; older top menus are not a supported compatibility target. The Hub dependency is `sd-model-hub>=0.1.8`, with its built UI included.
+Requires Python 3.10+, ComfyUI's V3 `ComfyExtension` and `get_system_user_directory()` APIs, and a frontend supporting `actionBarButtons`. The source baseline is ComfyUI 0.35.0 / frontend 1.55.9; older top menus are not a supported compatibility target. The Hub dependency is `sd-model-hub>=0.1.9`, with its built UI included.
 
 ## Behavior
 

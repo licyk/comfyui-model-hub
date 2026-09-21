@@ -19,7 +19,7 @@ git clone https://github.com/licyk/comfyui-model-hub.git custom_nodes/comfyui-mo
 
 重启 ComfyUI，刷新浏览器。扩展的 `prestartup_script.py` 会检查依赖，使用 **ComfyUI 当前运行的 Python** 安装缺失或版本不兼容的依赖。
 
-要求 Python 3.10+，ComfyUI 支持 V3 `ComfyExtension`、`get_system_user_directory()`，前端支持 `actionBarButtons`。开发基线为本地 ComfyUI 0.35.0 / 前端 1.55.9 源码；更早版本的顶部菜单未作兼容承诺。使用包含 Web UI 的 `sd-model-hub>=0.1.8` 发行包。
+要求 Python 3.10+，ComfyUI 支持 V3 `ComfyExtension`、`get_system_user_directory()`，前端支持 `actionBarButtons`。开发基线为本地 ComfyUI 0.35.0 / 前端 1.55.9 源码；更早版本的顶部菜单未作兼容承诺。使用包含 Web UI 的 `sd-model-hub>=0.1.9` 发行包。
 
 ## 使用与目录
 
