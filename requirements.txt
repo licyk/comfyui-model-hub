@@ -1,4 +1,4 @@
-sd-model-hub>=0.1.9
+sd-model-hub>=0.1.10
 aiohttp
 multidict
 yarl
