@@ -70,4 +70,8 @@ Type checking expects ComfyUI at `../ComfyUI`; otherwise pass `--extra-search-pa
 
 Tests use the real released Hub, temporary model directories, and a local download source. Chromium tests use the real Hub UI inside a small host implementing the public ComfyUI extension registration contract. They do not substitute for a full ComfyUI frontend/GPU workflow check.
 
+## Registry publishing
+
+The [publishing workflow](.github/workflows/publish.yml) follows ComfyUI-HakuImg. Add a Comfy Registry API key for publisher `licyk` to the repository's Actions secrets as `REGISTRY_ACCESS_TOKEN`. Updating `pyproject.toml` on `main` triggers publishing; the workflow also supports manual runs. Increase `project.version` before each new release.
+
 Licensed under [GPL-3.0-only](LICENSE). See [NOTICE](NOTICE) for the copied installation framework's attribution and modifications.

@@ -90,4 +90,8 @@ ty 默认从相邻的 `../ComfyUI` 解析宿主接口；不同目录布局请用
 
 集成测试运行真实 sd-model-hub 发行包、aiohttp 代理及本地下载源，模型和数据放在临时目录。浏览器测试使用真实 Chromium 和 Hub 页面，以及模拟 ComfyUI 扩展注册接口的小型宿主，不代表完整 ComfyUI 前端或 GPU 工作流验证。
 
+## Registry 发布
+
+[发布工作流](.github/workflows/publish.yml) 参考 ComfyUI-HakuImg。将发布者 `licyk` 的 Comfy Registry API 密钥添加到仓库的 Actions secrets，名称为 `REGISTRY_ACCESS_TOKEN`。`main` 分支的 `pyproject.toml` 更新时自动发布，也可以手动运行工作流。每次发布新版本前需递增 `project.version`。
+
 本项目采用 [GPL-3.0-only](LICENSE) 协议。复制的依赖安装框架来源及修改说明见 [NOTICE](NOTICE)。
