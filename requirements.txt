@@ -1,0 +1,4 @@
+sd-model-hub>=0.1.5,<0.2
+aiohttp>=3.9
+multidict>=6
+yarl>=1.9
