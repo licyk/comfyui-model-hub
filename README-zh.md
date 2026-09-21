@@ -19,7 +19,7 @@ git clone https://github.com/licyk/comfyui-model-hub.git custom_nodes/comfyui-mo
 
 重启 ComfyUI，刷新浏览器。扩展的 `prestartup_script.py` 会检查依赖，使用 **ComfyUI 当前运行的 Python** 安装缺失或版本不兼容的依赖。
 
-要求 Python 3.10+，ComfyUI 支持 V3 `ComfyExtension`、`get_system_user_directory()`，前端支持 `actionBarButtons`。开发基线为本地 ComfyUI 0.35.0 / 前端 1.55.9 源码；更早版本的顶部菜单未作兼容承诺。使用包含 Web UI 的 `sd-model-hub>=0.1.5,<0.2` 发行包。
+要求 Python 3.10+，ComfyUI 支持 V3 `ComfyExtension`、`get_system_user_directory()`，前端支持 `actionBarButtons`。开发基线为本地 ComfyUI 0.35.0 / 前端 1.55.9 源码；更早版本的顶部菜单未作兼容承诺。使用包含 Web UI 的 `sd-model-hub>=0.1.8` 发行包。
 
 ## 使用与目录
 
@@ -89,9 +89,5 @@ node tests/test_startup.mjs
 ty 默认从相邻的 `../ComfyUI` 解析宿主接口；不同目录布局请用 `--extra-search-path /path/to/ComfyUI`。浏览器测试可通过 `PLAYWRIGHT_CHROMIUM_EXECUTABLE` 使用已有 Chromium。
 
 集成测试运行真实 sd-model-hub 发行包、aiohttp 代理及本地下载源，模型和数据放在临时目录。浏览器测试使用真实 Chromium 和 Hub 页面，以及模拟 ComfyUI 扩展注册接口的小型宿主，不代表完整 ComfyUI 前端或 GPU 工作流验证。
-
-## Registry 发布
-
-[发布工作流](.github/workflows/publish.yml) 参考 ComfyUI-HakuImg。将发布者 `licyk` 的 Comfy Registry API 密钥添加到仓库的 Actions secrets，名称为 `REGISTRY_ACCESS_TOKEN`。`main` 分支的 `pyproject.toml` 更新时自动发布，也可以手动运行工作流。每次发布新版本前需递增 `project.version`。
 
 本项目采用 [GPL-3.0-only](LICENSE) 协议。复制的依赖安装框架来源及修改说明见 [NOTICE](NOTICE)。
