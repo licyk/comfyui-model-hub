@@ -70,4 +70,4 @@ Type checking expects ComfyUI at `../ComfyUI`; otherwise pass `--extra-search-pa
 
 Tests use the real released Hub, temporary model directories, and a local download source. Chromium tests use the real Hub UI inside a small host implementing the public ComfyUI extension registration contract. They do not substitute for a full ComfyUI frontend/GPU workflow check.
 
-Licensed under [GPL-3.0-only](LICENSE). The copied installation framework retains its original [Apache-2.0 license](LICENSES/Apache-2.0.txt); see [NOTICE](NOTICE) for attribution and modifications.
+Licensed under [GPL-3.0-only](LICENSE). See [NOTICE](NOTICE) for the copied installation framework's attribution and modifications.
