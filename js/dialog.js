@@ -59,8 +59,15 @@ export function createHubDialog({ start, url, standaloneUrl, text }) {
     frame.addEventListener("load", () => {
         if (!frame.hasAttribute("src")) return;
         clearTimeout(timeout);
-        const doc = frame.contentDocument;
-        if (!doc?.querySelector("#app")) {
+        // X-Frame-Options / CSP frame-ancestors refusals still fire load, leaving an
+        // inaccessible or never-navigated document instead of Hub's page.
+        let doc = null;
+        try { doc = frame.contentDocument; } catch { doc = null; }
+        if (!doc || doc.location.href === "about:blank") {
+            failed(new Error(text.framing));
+            return;
+        }
+        if (!doc.querySelector("#app")) {
             failed(new Error(text.unavailable));
             return;
         }

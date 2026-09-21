@@ -8,6 +8,9 @@ const translations = {
         title: "Model Manager", maximize: "Maximize", restore: "Restore", close: "Close", retry: "Retry", newTab: "Open in new tab",
         loading: "Starting SD Model Hub…", failed: "Unable to open Model Manager.",
         unavailable: "The interface did not load. Check the ComfyUI log and retry.",
+        framing: "The browser refused to embed the interface. A reverse proxy is sending X-Frame-Options: deny "
+            + "or a Content-Security-Policy frame-ancestors rule for this address. Allow same-origin embedding "
+            + "(X-Frame-Options: SAMEORIGIN, or frame-ancestors 'self'), or use Open in new tab.",
         startup: {
             notJson: "The server returned a non-JSON response.",
             missing: "The extension startup endpoint was not found. Restart ComfyUI and check its extension loading log and proxy routes.",
@@ -20,6 +23,9 @@ const translations = {
         title: "模型管理器", maximize: "最大化", restore: "还原", close: "关闭", retry: "重试", newTab: "在新标签页打开",
         loading: "正在启动 SD Model Hub…", failed: "无法打开模型管理器。",
         unavailable: "界面未能加载，请检查 ComfyUI 日志后重试。",
+        framing: "浏览器拒绝嵌入该界面。反向代理为该地址返回了 X-Frame-Options: deny 或 "
+            + "Content-Security-Policy 的 frame-ancestors 限制。请允许同源嵌入"
+            + "（X-Frame-Options: SAMEORIGIN 或 frame-ancestors 'self'），或使用“在新标签页打开”。",
         startup: {
             notJson: "服务器返回的内容不是 JSON。",
             missing: "未找到扩展启动接口。请重启 ComfyUI，并检查扩展加载日志和反向代理路由。",

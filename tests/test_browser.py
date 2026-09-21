@@ -148,6 +148,24 @@ async def test_button_iframe_close_reopen_retry_and_refresh(tmp_path):
             assert await popup.evaluate("window.opener === null")
             await popup.close()
             await tab.unroute("**/comfy/api/model-hub-extension/start", forbidden_start)
+
+            # A deployment that refuses framing must be named instead of the generic failure.
+            async def deny_framing(route):
+                if route.request.resource_type != "document":
+                    await route.continue_()
+                    return
+                await route.fulfill(
+                    status=200,
+                    content_type="text/html",
+                    headers={"X-Frame-Options": "deny"},
+                    body='<html><body><div id="app"></div></body></html>',
+                )
+
+            await tab.route("**/comfy/model-hub/**", deny_framing)
+            await tab.get_by_role("button", name="Retry", exact=True).click()
+            await expect(tab.get_by_role("status")).to_contain_text("X-Frame-Options")
+            await expect(tab.locator("iframe")).to_be_hidden()
+            await tab.unroute("**/comfy/model-hub/**", deny_framing)
             await tab.get_by_role("button", name="Close", exact=True).click()
             await button.click()
             frame = tab.frame_locator("iframe")
@@ -157,7 +175,8 @@ async def test_button_iframe_close_reopen_retry_and_refresh(tmp_path):
             if os.getenv("MODEL_HUB_SCREENSHOT"):
                 await tab.screenshot(path=os.environ["MODEL_HUB_SCREENSHOT"])
             assert service.state == "ready"
-            assert "/comfy/model-hub/#/library" in await tab.locator("iframe").get_attribute("src")
+            hub_src = await tab.locator("iframe").get_attribute("src")
+            assert "/comfy/model-hub/" in hub_src and hub_src.endswith("#/library")
             assert await tab.locator("iframe").count() == 1
             await frame.locator("body").evaluate("el => el.dataset.sessionMarker = 'kept'")
             await tab.get_by_role("button", name="Maximize", exact=True).click()
