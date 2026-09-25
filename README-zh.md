@@ -51,7 +51,7 @@ export COMFYUI_MODEL_HUB_PUBLIC_BASE_URL=https://example.com/comfy/model-hub
 
 浏览器提供有效 Origin 且 `Sec-Fetch-Site: same-origin` 时，即使代理终止 TLS 或改写 Host，扩展仍识别为同源请求；跨站请求和 `Origin: null` 仍会拒绝。ComfyUI 被嵌入其他站点或沙箱页面导致来源不可用时，可使用“在新标签页打开”。
 
-窗口通过同源 iframe 嵌入 `/model-hub/`。反向代理或 CDN 为该站点添加 `X-Frame-Options: DENY`，或设置了限制性的 `Content-Security-Policy` `frame-ancestors` 时，即使父页面同源也会被浏览器拒绝嵌入，窗口会提示嵌入被拒绝。请为 ComfyUI 所在站点返回 `X-Frame-Options: SAMEORIGIN`（或 `frame-ancestors 'self'`），或改用“在新标签页打开”——顶层跳转不受该限制。
+窗口通过同源 iframe 嵌入 `/model-hub/`。扩展转发的 Hub 响应带有 `Content-Security-Policy: frame-ancestors 'self'`，浏览器会因此忽略反向代理或 CDN 添加的 `X-Frame-Options: DENY`。若代理自身的 `Content-Security-Policy` 设置了限制性的 `frame-ancestors`，或代理删除、替换了后端的 CSP 响应头，即使父页面同源也会被浏览器拒绝嵌入，窗口会提示嵌入被拒绝。请为 ComfyUI 所在站点允许 `frame-ancestors 'self'`，或改用“在新标签页打开”——顶层跳转不受该限制。
 
 上述环境变量是浏览器实际访问的完整 Hub 地址。启用 Civitai OAuth，或代理删除浏览器来源元数据时应显式设置它；扩展不会信任客户端传入的 `X-Forwarded-*` 来决定 OAuth 回调地址。OAuth 回调还必须按 Hub 的要求登记到提供方：
 

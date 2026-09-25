@@ -175,6 +175,10 @@ button{font:inherit;padding:.4rem 1rem}p{white-space:pre-wrap}</style></head><bo
             allow_redirects=False,
         ) as upstream:
             response_headers = filtered_headers(upstream.headers)
+            # Browsers ignore X-Frame-Options when a response carries frame-ancestors, so a proxy's
+            # X-Frame-Options: DENY no longer blocks the ComfyUI dialog. A separate CSP only adds
+            # restrictions: any policy from Hub or the proxy still applies.
+            response_headers.add("Content-Security-Policy", "frame-ancestors 'self'")
             location = response_headers.get("Location")
             if location:
                 internal = str(url.origin())

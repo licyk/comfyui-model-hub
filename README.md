@@ -39,7 +39,7 @@ All browser traffic uses ComfyUI's same-origin `/model-hub/` path. The private H
 
 Forward the entire ComfyUI deployment path, including WebSocket upgrades. Valid browser origins accompanied by `Sec-Fetch-Site: same-origin` remain accepted after proxy TLS termination or Host rewriting. Cross-site and opaque (`Origin: null`) requests remain rejected; use **Open in new tab** if ComfyUI is embedded in a sandbox or another website.
 
-The dialog embeds `/model-hub/` in a same-origin iframe. A reverse proxy or CDN that adds `X-Frame-Options: DENY`, or a `Content-Security-Policy` with a restrictive `frame-ancestors`, blocks that embed even though the parent page is the same origin, and the dialog reports the refused framing. Send `X-Frame-Options: SAMEORIGIN` (or `frame-ancestors 'self'`) for the ComfyUI host, or use **Open in new tab**, which is a top-level navigation and stays unaffected.
+The dialog embeds `/model-hub/` in a same-origin iframe. Proxied Hub responses carry `Content-Security-Policy: frame-ancestors 'self'`, so browsers ignore an `X-Frame-Options: DENY` that a reverse proxy or CDN adds. A restrictive `frame-ancestors` in the proxy's own `Content-Security-Policy`, or a proxy that strips or replaces backend CSP headers, still blocks the embed even though the parent page is the same origin, and the dialog reports the refused framing. Allow `frame-ancestors 'self'` for the ComfyUI host, or use **Open in new tab**, which is a top-level navigation and stays unaffected.
 
 For Civitai OAuth, or proxies that remove browser origin metadata, explicitly set the public Hub URL, including any proxy prefix:
 

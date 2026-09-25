@@ -83,7 +83,12 @@ async def test_streaming_headers_cookie_and_redirect_handling(hub):
         captured.append(dict(request.headers))
         if request.match_info["tail"] == "redirect":
             raise web.HTTPTemporaryRedirect(location=f"http://{request.host}/model-hub/destination")
-        headers = {"Content-Encoding": "gzip", "Content-Type": "text/plain", "Cache-Control": "public, max-age=60"}
+        headers = {
+            "Content-Encoding": "gzip",
+            "Content-Type": "text/plain",
+            "Cache-Control": "public, max-age=60",
+            "Content-Security-Policy": "default-src 'self'",
+        }
         response = web.Response(body=gzip.compress(b"body compressed once"), headers=headers)
         response.set_cookie("sd_model_hub_oauth", "transaction", path="/model-hub/api/v1/auth/civitai", httponly=True, samesite="Lax")
         response.set_cookie("second", "preserved")
@@ -110,6 +115,8 @@ async def test_streaming_headers_cookie_and_redirect_handling(hub):
             assert await response.text() == "body compressed once"
             assert response.headers["Cache-Control"] == "public, max-age=60"
             assert len(response.headers.getall("Set-Cookie")) == 2
+            # Overrides a proxy's X-Frame-Options: DENY without dropping Hub's own policy.
+            assert response.headers.getall("Content-Security-Policy") == ["default-src 'self'", "frame-ancestors 'self'"]
             assert captured[0]["Authorization"] == "Bearer " + service.token
             assert "X-Forwarded-Host" not in captured[0]
             assert captured[0]["Cookie"] == "sd_model_hub_oauth=binding"

@@ -166,11 +166,22 @@ async def test_button_iframe_close_reopen_retry_and_refresh(tmp_path):
             await expect(tab.get_by_role("status")).to_contain_text("X-Frame-Options")
             await expect(tab.locator("iframe")).to_be_hidden()
             await tab.unroute("**/comfy/model-hub/**", deny_framing)
+
+            # A proxy adding only X-Frame-Options is overridden by the Hub's frame-ancestors policy.
+            async def proxy_denies_framing(route):
+                if route.request.resource_type != "document":
+                    await route.continue_()
+                    return
+                response = await route.fetch()
+                await route.fulfill(response=response, headers={**response.headers, "x-frame-options": "deny"})
+
+            await tab.route("**/comfy/model-hub/**", proxy_denies_framing)
             await tab.get_by_role("button", name="Close", exact=True).click()
             await button.click()
             frame = tab.frame_locator("iframe")
             await expect(frame.get_by_role("navigation", name="Main", exact=True)).to_be_visible(timeout=30000)
             await expect(frame.locator("p.root-path")).to_have_text(str(model_dir))
+            await tab.unroute("**/comfy/model-hub/**", proxy_denies_framing)
             await expect(frame.locator(".root-select md-select-option").first).to_have_text("所有模型目录")
             if os.getenv("MODEL_HUB_SCREENSHOT"):
                 await tab.screenshot(path=os.environ["MODEL_HUB_SCREENSHOT"])
