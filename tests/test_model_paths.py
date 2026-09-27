@@ -5,6 +5,8 @@ from comfyui_model_hub.runtime.package_analyzer import validate_requirements
 
 def test_priority_aliases_auxiliary_and_unknown_categories(tmp_path):
     external = tmp_path / "external"
+    for name in ("approx", "latent", "vae", "upscalers", "text", "clip", "configs", "detector"):
+        (tmp_path / name).mkdir()
     paths = collect_model_paths(
         {
             "vae_approx": ([str(tmp_path / "approx")], set()),
@@ -19,7 +21,9 @@ def test_priority_aliases_auxiliary_and_unknown_categories(tmp_path):
         }
     )
     by_id = {root["id"]: root for root in paths.roots}
-    assert by_id[paths.destinations["vae"]["root_id"]]["path"] == str(external)
+    # The missing first VAE folder is skipped, so the next existing one takes the default.
+    assert by_id[paths.destinations["vae"]["root_id"]]["path"] == str(tmp_path / "vae")
+    assert all(root["path"] != str(external) for root in paths.roots)
     assert by_id[paths.destinations["upscaler"]["root_id"]]["path"] == str(tmp_path / "upscalers")
     assert sum(root["path"] == str(tmp_path / "clip") for root in paths.roots) == 1
     assert all(root["layout"] == "custom" for root in paths.roots)
@@ -49,6 +53,8 @@ def test_requirements_use_extension_root():
 
 def test_complete_directory_leads_without_changing_download_destinations(tmp_path):
     models = tmp_path / "models"
+    (models / "checkpoints").mkdir(parents=True)
+    (tmp_path / "external-loras").mkdir()
     registry = {
         "classifiers": ([str(models / "classifiers")], set()),
         "checkpoints": ([str(models / "checkpoints")], set()),
@@ -63,6 +69,21 @@ def test_complete_directory_leads_without_changing_download_destinations(tmp_pat
     assert paths.roots[1:] == original.roots
     assert paths.destinations == original.destinations
     assert paths.default_download_root == original.roots[0]["id"]
+    assert "classifiers" not in paths.categories
+    assert not (models / "classifiers").exists()
+
+
+def test_missing_directories_are_not_registered(tmp_path):
+    models = tmp_path / "models"
+    registry = {
+        "classifiers": ([str(models / "classifiers")], set()),
+        "checkpoints": ([str(models / "checkpoints")], set()),
+    }
+    paths = collect_model_paths(registry, models)
+    assert paths.roots == []
+    assert paths.destinations == {}
+    assert paths.categories == set()
+    assert paths.default_download_root is None
     assert not models.exists()
 
 

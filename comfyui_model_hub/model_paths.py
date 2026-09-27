@@ -56,7 +56,11 @@ class ModelPaths:
 
 
 def collect_model_paths(registry: Mapping[str, tuple[Sequence[str], Any]], models_dir: str | Path | None = None) -> ModelPaths:
-    """Preserve per-category priority; auxiliary folders never take primary defaults."""
+    """Preserve per-category priority; auxiliary folders never take primary defaults.
+
+    ComfyUI registers folders it never creates (such as "classifiers"), so only existing
+    directories become roots; discovery never creates them.
+    """
     by_path: dict[str, dict[str, Any]] = {}
     destinations: dict[str, dict[str, str]] = {}
     categories: set[str] = set()
@@ -66,6 +70,8 @@ def collect_model_paths(registry: Mapping[str, tuple[Sequence[str], Any]], model
         kind = KINDS.get(category)
         for index, directory in enumerate(registry[category][0]):
             path = str(Path(directory).expanduser().resolve())
+            if not os.path.isdir(path):
+                continue
             identity = os.path.normcase(path)
             root = by_path.get(identity)
             if root is None:
@@ -85,14 +91,14 @@ def collect_model_paths(registry: Mapping[str, tuple[Sequence[str], Any]], model
                 destinations[kind] = {"root_id": str(root["id"]), "rel_dir": ""}
     roots = list(by_path.values())
     default_download_root = None
-    if models_dir is not None:
+    models_path = None if models_dir is None else str(Path(models_dir).expanduser().resolve())
+    if models_path is not None and os.path.isdir(models_path):
         # Keep the old first-root download fallback while showing the complete directory first.
         default_download_root = str(roots[0]["id"]) if roots else None
-        path = str(Path(models_dir).expanduser().resolve())
-        identity = os.path.normcase(path)
+        identity = os.path.normcase(models_path)
         complete: dict[str, Any] | None = by_path.get(identity)
         if complete is None:
-            complete = {"id": "comfy-" + hashlib.sha256(identity.encode()).hexdigest()[:16], "path": path}
+            complete = {"id": "comfy-" + hashlib.sha256(identity.encode()).hexdigest()[:16], "path": models_path}
         else:
             roots.remove(complete)
         complete.update(name="所有模型目录", layout="comfyui", kind=None)

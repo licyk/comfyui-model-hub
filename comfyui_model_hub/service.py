@@ -11,7 +11,7 @@ from typing import Any
 from .events import subscribe_changes
 from .model_paths import ModelPaths
 
-logger = logging.getLogger("ComfyUI-Model-Hub")
+logger = logging.getLogger("Model-Hub")
 HUB_PREFIX = "/model-hub"
 # Records which of this extension's defaults were applied to Hub's settings, so each is applied once.
 DEFAULTS_MARKER = "comfyui-defaults.json"

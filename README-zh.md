@@ -68,7 +68,7 @@ https://example.com/comfy/model-hub/api/v1/auth/civitai/callback
 | `COMFYUI_MODEL_HUB_AUTO_INSTALL` | `1` | 设置为 `0` 禁用启动前自动安装 |
 | `COMFYUI_MODEL_HUB_PUBLIC_BASE_URL` | 未设置 | 固定外部 Hub 地址，支持 TLS 终止及 OAuth |
 | `COMFYUI_MODEL_HUB_COMBINED_VIEW` | 未设置 | `1` 固定开启“全部文件夹”，`0` 固定关闭，Hub 设置中的开关随之禁用；未设置时扩展在 Hub 首次启动时开启它，并记录在 Hub 设置旁的 `comfyui-defaults.json` 中，用户关闭后保持关闭 |
-| `COMFYUI_MODEL_HUB_LOGGER_NAME` | `ComfyUI-Model-Hub` | 安装框架日志名称 |
+| `COMFYUI_MODEL_HUB_LOGGER_NAME` | `Model-Hub` | 安装框架日志名称 |
 | `COMFYUI_MODEL_HUB_LOGGER_LEVEL` | `20` | 安装框架日志级别 |
 | `COMFYUI_MODEL_HUB_LOGGER_COLOR` | `1` | 设置为 `0` 关闭安装框架彩色日志 |
 

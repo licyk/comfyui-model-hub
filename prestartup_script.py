@@ -18,7 +18,7 @@ def setup() -> None:
 
         setup_model_hub()
     except Exception:
-        logging.getLogger("ComfyUI-Model-Hub").exception(
+        logging.getLogger("Model-Hub").exception(
             "Dependency setup failed. Install requirements.txt with ComfyUI's Python and restart."
         )
     finally:

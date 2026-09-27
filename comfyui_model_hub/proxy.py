@@ -12,7 +12,7 @@ from yarl import URL
 
 from .service import HUB_PREFIX, HubService
 
-logger = logging.getLogger("ComfyUI-Model-Hub")
+logger = logging.getLogger("Model-Hub")
 HOP_HEADERS = {"connection", "keep-alive", "proxy-authenticate", "proxy-authorization", "te", "trailer", "transfer-encoding", "upgrade"}
 CALLBACK = HUB_PREFIX + "/api/v1/auth/civitai/callback"
 
