@@ -9,7 +9,7 @@ from comfy_api.latest import ComfyExtension
 from .events import EVENT_NAME
 from .model_paths import collect_model_paths
 from .proxy import HubProxy
-from .runtime.config import public_base_url
+from .runtime.config import combined_view, public_base_url
 from .service import HubService
 
 
@@ -38,6 +38,7 @@ class ModelHubExtension(ComfyExtension):
             lambda: collect_model_paths(folder_paths.folder_names_and_paths, folder_paths.models_dir),
             notify,
             public_base_url(),
+            combined_view=combined_view(),
         )
         loopback = {"127.0.0.1", "localhost", "::1"}
         listeners = set(args.listen.split(","))

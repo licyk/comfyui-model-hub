@@ -5,6 +5,8 @@
 - 界面在 ComfyUI 内打开，支持最大化、关闭和重试；关闭窗口不停止下载。
 - 自动接入 ComfyUI 已注册的模型目录，包括 `extra_model_paths.yaml`、自定义模型路径、旧 `clip` / `unet` 目录和其他扩展注册的模型目录。
 - 目录列表首项“所有模型目录”可浏览 ComfyUI 主 `models` 文件夹及其子目录；主目录之外的模型路径保留独立入口。
+- “全部文件夹”位于目录列表最前，模型库默认从这里打开：并排显示所有目录（含主目录之外的路径）中的文件夹。第一层含有模型文件的目录（如 WebUI 的 `models/Lora`）会以自身名称（`Lora`）作为一个文件夹显示，文件不会散落出来；同名文件夹会标注所属目录。扩展只在首次启动时开启它；在 Hub 设置中关闭后会保持关闭，也可用 `COMFYUI_MODEL_HUB_COMBINED_VIEW` 固定。
+- 本地模型文件可通过浏览器自带的下载功能保存到本机。
 - 下载完成及模型文件操作后自动刷新 ComfyUI 模型列表。
 - 首次打开时启动服务，日常启动 ComfyUI 不扫描模型库。
 - Python 安装和目录结构参考 [ComfyUI-HakuImg](https://github.com/licyk/ComfyUI-HakuImg)，无需 Node.js 或前端构建。
@@ -65,6 +67,7 @@ https://example.com/comfy/model-hub/api/v1/auth/civitai/callback
 |---|---|---|
 | `COMFYUI_MODEL_HUB_AUTO_INSTALL` | `1` | 设置为 `0` 禁用启动前自动安装 |
 | `COMFYUI_MODEL_HUB_PUBLIC_BASE_URL` | 未设置 | 固定外部 Hub 地址，支持 TLS 终止及 OAuth |
+| `COMFYUI_MODEL_HUB_COMBINED_VIEW` | 未设置 | `1` 固定开启“全部文件夹”，`0` 固定关闭，Hub 设置中的开关随之禁用；未设置时扩展在 Hub 首次启动时开启它，并记录在 Hub 设置旁的 `comfyui-defaults.json` 中，用户关闭后保持关闭 |
 | `COMFYUI_MODEL_HUB_LOGGER_NAME` | `ComfyUI-Model-Hub` | 安装框架日志名称 |
 | `COMFYUI_MODEL_HUB_LOGGER_LEVEL` | `20` | 安装框架日志级别 |
 | `COMFYUI_MODEL_HUB_LOGGER_COLOR` | `1` | 设置为 `0` 关闭安装框架彩色日志 |

@@ -1,6 +1,7 @@
 """Own a lazily started Hub server without blocking ComfyUI's event loop."""
 
 import asyncio
+import json
 import logging
 import secrets
 from collections.abc import Callable
@@ -12,6 +13,8 @@ from .model_paths import ModelPaths
 
 logger = logging.getLogger("ComfyUI-Model-Hub")
 HUB_PREFIX = "/model-hub"
+# Records which of this extension's defaults were applied to Hub's settings, so each is applied once.
+DEFAULTS_MARKER = "comfyui-defaults.json"
 
 
 class HubService:
@@ -22,11 +25,13 @@ class HubService:
         notify: Callable[[], None],
         public_base_url: str | None = None,
         factory: Callable[..., Any] | None = None,
+        combined_view: bool | None = None,
     ) -> None:
         self.data_dir = data_dir
         self.paths = paths
         self.notify = notify
         self.public_base_url = public_base_url
+        self.combined_view = combined_view
         self.token = secrets.token_urlsafe(32)
         self._factory = factory
         self._hub: Any = None
@@ -97,6 +102,8 @@ class HubService:
             api_prefix=HUB_PREFIX,
             public_base_url=self.public_base_url,
             settings={"downloads": downloads, "server": {"allowed_origins": []}},
+            # None leaves "All folders" to Hub's own setting, which the default below turns on once.
+            combined_view=self.combined_view,
         )
         try:
             self._hub.start()
@@ -104,6 +111,29 @@ class HubService:
             self._hub.stop()
             self._hub = None
             raise
+        services = self._hub.services
+        if self.combined_view is None and services is not None:
+            try:
+                self._default_combined_view(services.settings)
+            except Exception:
+                logger.warning("Could not turn on All folders by default; Hub's settings can still turn it on", exc_info=True)
+
+    def _default_combined_view(self, settings: Any) -> None:
+        """Turn "All folders" on for ComfyUI's Hub, once: ComfyUI registers many directories, so a
+        view of all of them is the useful start. A user who turns it off keeps it off."""
+        marker = self.data_dir / DEFAULTS_MARKER
+        try:
+            applied = set(json.loads(marker.read_text(encoding="utf-8")).get("applied", []))
+        except FileNotFoundError:
+            applied = set()
+        except (OSError, ValueError, AttributeError):
+            logger.warning("Could not read %s; All folders keeps its current setting", marker)
+            return
+        if "library.combined_view" in applied:
+            return
+        settings.update({"library": {"combined_view": True}})
+        applied.add("library.combined_view")
+        marker.write_text(json.dumps({"applied": sorted(applied)}), encoding="utf-8")
 
     async def close(self) -> None:
         self._closing = True

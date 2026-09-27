@@ -7,6 +7,8 @@ Open [SD Model Hub](https://pypi.org/project/sd-model-hub/) inside ComfyUI using
 - Closing the window preserves its state and leaves downloads running.
 - Uses ComfyUI's registered model directories, including extra paths and legacy aliases.
 - The first directory option, **所有模型目录** (All model directories), opens ComfyUI's main `models` folder and its subdirectories; external paths keep their own entries.
+- **All folders** leads the directory list and is where the library opens: the folders of every directory side by side, including external paths. A directory with model files at its top level, such as a WebUI's `models/Lora`, appears as one folder under its own name (`Lora`) so its files stay together; same-named folders are labelled by their directory. The extension turns it on once; turning it off in Hub's settings is kept, and `COMFYUI_MODEL_HUB_COMBINED_VIEW` can pin it.
+- A local model file can be saved to your computer through the browser's own download manager.
 - Refreshes ComfyUI model lists after downloads and file operations.
 - Starts the Hub on demand, with no model scan during ComfyUI startup.
 - Reuses the dependency installation framework from [ComfyUI-HakuImg](https://github.com/licyk/ComfyUI-HakuImg). No Node.js build is needed.
@@ -50,6 +52,8 @@ export COMFYUI_MODEL_HUB_PUBLIC_BASE_URL=https://example.com/comfy/model-hub
 Register `https://example.com/comfy/model-hub/api/v1/auth/civitai/callback` with the OAuth provider as required by Hub. Client-supplied forwarding headers do not choose callback URLs. Manual source tokens work without OAuth configuration.
 
 Hub inherits access to ComfyUI; ComfyUI user IDs do not provide separate Hub authorization. Existing deployment authentication must cover both HTTP and WebSocket paths.
+
+Set `COMFYUI_MODEL_HUB_COMBINED_VIEW=1` to fix **All folders** on, or `0` to fix it off; either way Hub's settings switch is then disabled. Unset, the extension turns it on the first time Hub starts and records that in `comfyui-defaults.json` beside Hub's settings, so a user who turns it off keeps it off.
 
 Set `COMFYUI_MODEL_HUB_AUTO_INSTALL=0` to manage dependencies manually. Installer logging can be configured through `COMFYUI_MODEL_HUB_LOGGER_NAME`, `COMFYUI_MODEL_HUB_LOGGER_LEVEL` (default `20`) and `COMFYUI_MODEL_HUB_LOGGER_COLOR` (`0` disables color).
 

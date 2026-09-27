@@ -143,7 +143,8 @@ async def test_button_iframe_close_reopen_retry_and_refresh(tmp_path):
             async with tab.expect_popup() as popup_info:
                 await tab.get_by_role("link", name="Open in new tab").click()
             popup = await popup_info.value
-            await expect(popup.locator("p.root-path")).to_have_text(str(model_dir), timeout=30000)
+            # The extension turns All folders on, so the library opens there.
+            await expect(popup.locator('[aria-current="location"]')).to_have_text("All folders", timeout=30000)
             assert "/comfy/model-hub/#/library" in popup.url
             assert await popup.evaluate("window.opener === null")
             await popup.close()
@@ -180,9 +181,25 @@ async def test_button_iframe_close_reopen_retry_and_refresh(tmp_path):
             await button.click()
             frame = tab.frame_locator("iframe")
             await expect(frame.get_by_role("navigation", name="Main", exact=True)).to_be_visible(timeout=30000)
-            await expect(frame.locator("p.root-path")).to_have_text(str(model_dir))
+            await expect(frame.locator('[aria-current="location"]')).to_have_text("All folders")
             await tab.unroute("**/comfy/model-hub/**", proxy_denies_framing)
-            await expect(frame.locator(".root-select md-select-option").first).to_have_text("所有模型目录")
+            options = frame.locator(".root-select md-select-option")
+            await expect(options.nth(0)).to_have_text("All folders")
+            await expect(options.nth(1)).to_have_text("所有模型目录")
+            # The nested per-category root is reached through the complete directory, not listed twice.
+            await expect(frame.locator("button.folder")).to_have_count(1)
+            await frame.locator("button.folder", has_text="loras").click()
+            await expect(frame.locator(".path-text")).to_have_text(str(model_dir))
+            # The path is cut at its start to fit, but its leading "/" must stay first, not drawn at the end.
+            first, last = await frame.locator(".path-text bdi").evaluate(
+                """bdi => [0, bdi.firstChild.length - 1].map(i => {
+                    const range = document.createRange();
+                    range.setStart(bdi.firstChild, i);
+                    range.setEnd(bdi.firstChild, i + 1);
+                    return range.getBoundingClientRect().left;
+                })"""
+            )
+            assert first < last
             if os.getenv("MODEL_HUB_SCREENSHOT"):
                 await tab.screenshot(path=os.environ["MODEL_HUB_SCREENSHOT"])
             assert service.state == "ready"
@@ -213,7 +230,7 @@ async def test_button_iframe_close_reopen_retry_and_refresh(tmp_path):
             service._factory = original
             await tab.get_by_role("button", name="Retry", exact=True).click()
             await expect(frame.get_by_role("navigation", name="Main", exact=True)).to_be_visible(timeout=30000)
-            await expect(frame.locator("p.root-path")).to_have_text(str(model_dir))
+            await expect(frame.locator(".path-text")).to_have_text(str(model_dir))
             assert errors == []
         finally:
             await browser.close()

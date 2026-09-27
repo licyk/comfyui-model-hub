@@ -166,3 +166,73 @@ async def test_real_download_finishes_without_a_ui(hub):
         assert (models / "fixture.bin").read_bytes() == payload
         await asyncio.sleep(0.6)
         assert notifications
+
+
+def same_origin(client) -> dict[str, str]:
+    return {"Origin": str(client.make_url("/")).rstrip("/")}
+
+
+async def test_all_folders_start_on_and_stay_off_once_turned_off(hub):
+    service, _, client, _, _ = hub
+    await start(client)
+    settings = await (await client.get("/model-hub/api/v1/settings")).json()
+    assert settings["library"]["combined_view"] is True
+    assert "library.combined_view" not in settings["pinned"]
+    response = await client.patch("/model-hub/api/v1/settings", json={"library": {"combined_view": False}}, headers=same_origin(client))
+    assert response.status == 200, await response.text()
+    assert (await response.json())["library"]["combined_view"] is False
+    # The default is applied once: restarting ComfyUI's Hub keeps the user's choice.
+    await service.close()
+    service._closing = False
+    await start(client)
+    settings = await (await client.get("/model-hub/api/v1/settings")).json()
+    assert settings["library"]["combined_view"] is False
+
+
+async def test_pinned_all_folders_list_every_comfyui_directory_once(hub):
+    service, _, client, models, _ = hub
+    checkpoints = models / "checkpoints"
+    checkpoints.mkdir()
+    (checkpoints / "inside.safetensors").write_bytes(b"x")
+    external = models.parent / "external-loras"
+    (external / "checkpoints").mkdir(parents=True)
+    (external / "outside.safetensors").write_bytes(b"x")
+    service.paths = lambda: collect_model_paths(
+        {"checkpoints": ([str(checkpoints)], set()), "loras": ([str(external)], set())}, models
+    )
+    service.combined_view = True
+    await start(client)
+    settings = await (await client.get("/model-hub/api/v1/settings")).json()
+    assert settings["library"]["combined_view"] is True and "library.combined_view" in settings["pinned"]
+    response = await client.patch("/model-hub/api/v1/settings", json={"library": {"combined_view": False}}, headers=same_origin(client))
+    assert (await response.json())["library"]["combined_view"] is True
+
+    listing = await (await client.get("/model-hub/api/v1/library/combined/entries")).json()
+    roots = {root["id"]: root for root in await (await client.get("/model-hub/api/v1/library/roots")).json()}
+    # The per-category root inside models/ is reached through the complete directory, not repeated.
+    # The external root has a file at its top, so it stays one folder under its own directory's
+    # name, with its file and its "checkpoints" folder inside rather than loose among the rest.
+    assert sorted((f["label"], roots[f["root_id"]]["path"], f["path"], f["is_root"]) for f in listing["folders"]) == [
+        ("checkpoints", str(models), "checkpoints", False),
+        ("external-loras", str(external), "", True),
+    ]
+    assert "models" not in listing
+
+
+async def test_a_library_file_downloads_through_the_proxy(hub):
+    _, _, client, models, _ = hub
+    content = bytes(range(256)) * 4096
+    (models / "模型 #1.safetensors").write_bytes(content)
+    (models / "busy.safetensors.part").write_bytes(b"x")
+    await start(client)
+    root_id = (await (await client.get("/model-hub/api/v1/library/roots")).json())[0]["id"]
+    url = f"/model-hub/api/v1/library/roots/{root_id}/file"
+    response = await client.get(url, params={"path": "模型 #1.safetensors"})
+    assert response.status == 200
+    assert response.headers["Content-Disposition"].startswith("attachment;")
+    assert "filename*=utf-8''%E6%A8%A1%E5%9E%8B%20%231.safetensors" in response.headers["Content-Disposition"]
+    assert await response.read() == content
+    # A browser resuming a large model sends a range; the proxy must pass it through.
+    response = await client.get(url, params={"path": "模型 #1.safetensors"}, headers={"Range": "bytes=256-511"})
+    assert response.status == 206 and await response.read() == content[256:512]
+    assert (await client.get(url, params={"path": "busy.safetensors.part"})).status == 404
