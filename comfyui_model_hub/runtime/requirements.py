@@ -23,3 +23,4 @@ def setup_model_hub() -> None:
         importlib.invalidate_caches()
         if not validate_requirements(REQUIREMENTS_PATH):
             raise RuntimeError("SD Model Hub requirements are still incomplete; check the pip output above")
+    logger.info("Checking SD Model Hub requirements done")
