@@ -23,7 +23,7 @@ git clone https://github.com/licyk/comfyui-model-hub.git custom_nodes/comfyui-mo
 
 ## 使用与目录
 
-顶部按钮或 Tools 菜单中的 **Open Model Manager** 打开窗口，默认进入本地模型库。窗口内可切换 Hub 原有的其他页面。顶部按钮与 comfyui-browser 使用相同的 ComfyUI 原生按钮尺寸，图标为 Lucide Package。
+顶部按钮或 Tools 菜单中的 **Open Model Manager** 打开窗口，默认进入本地模型库。窗口内可切换 Hub 原有的其他页面。顶部按钮图标为 Lucide Package：新版前端（1.32.4 及以上）使用操作栏按钮，旧版前端使用与 comfyui-browser 尺寸相同的旧顶部菜单按钮。
 
 窗口标题栏提供 **在新标签页打开**。即使内嵌窗口启动失败，也可以使用此链接：新标签页会在自己的来源下独立启动 Hub，再进入模型库，无需先在原窗口启动成功。
 
@@ -86,7 +86,7 @@ python -m ruff format --check .
 python -m ty check --python /path/to/comfy/python
 node --check js/model_hub.js
 node --check js/dialog.js
-node tests/test_startup.mjs
+node --test tests/*.mjs
 ```
 
 ty 默认从相邻的 `../ComfyUI` 解析宿主接口；不同目录布局请用 `--extra-search-path /path/to/ComfyUI`。浏览器测试可通过 `PLAYWRIGHT_CHROMIUM_EXECUTABLE` 使用已有 Chromium。

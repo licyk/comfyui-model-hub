@@ -1,6 +1,7 @@
 import { app } from "../../scripts/app.js";
 import { api } from "../../scripts/api.js";
 import { createHubDialog } from "./dialog.js";
+import { hasActionBar } from "./frontend.js";
 import { readStartupResponse } from "./startup.js";
 
 const translations = {
@@ -76,6 +77,29 @@ async function refresh() {
     } finally { refreshing = false; }
 }
 
+// Older frontends have no action bar API; their top menu takes a ComfyButton instead.
+async function addLegacyButton() {
+    try {
+        const [{ ComfyButton }, { ComfyButtonGroup }] = await Promise.all([
+            import("../../scripts/ui/components/button.js"),
+            import("../../scripts/ui/components/buttonGroup.js"),
+        ]);
+        const icon = document.createElement("i");
+        icon.className = "icon-[lucide--package] comfy-model-hub-icon";
+        icon.setAttribute("aria-hidden", "true");
+        const button = new ComfyButton({
+            action: () => void open(), tooltip: text().title, content: icon,
+            classList: "comfyui-button comfyui-menu-mobile-collapse comfy-model-hub-button",
+        });
+        button.element.setAttribute("aria-label", text().title);
+        const group = new ComfyButtonGroup(button.element);
+        app.menu.settingsGroup.element.before(group.element);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 app.registerExtension({
     name: "ComfyUI.ModelHub",
     commands: [{ id: "ComfyUI.ModelHub.Open", label: "Open Model Manager", function: open }],
@@ -89,23 +113,9 @@ app.registerExtension({
             clearTimeout(refreshTimer);
             refreshTimer = setTimeout(() => void refresh(), 400);
         });
-        try {
-            if (!app.menu?.settingsGroup?.element) throw new Error("Legacy toolbar is unavailable");
-            const [{ ComfyButton }, { ComfyButtonGroup }] = await Promise.all([
-                import("../../scripts/ui/components/button.js"),
-                import("../../scripts/ui/components/buttonGroup.js"),
-            ]);
-            const icon = document.createElement("i");
-            icon.className = "icon-[lucide--package] comfy-model-hub-icon";
-            icon.setAttribute("aria-hidden", "true");
-            const button = new ComfyButton({
-                action: () => void open(), tooltip: text().title, content: icon,
-                classList: "comfyui-button comfyui-menu-mobile-collapse comfy-model-hub-button",
-            });
-            button.element.setAttribute("aria-label", text().title);
-            const group = new ComfyButtonGroup(button.element);
-            app.menu.settingsGroup.element.before(group.element);
-        } catch {
+        // Newer frontends log every import of the deprecated legacy button modules.
+        const legacy = !hasActionBar(window.__COMFYUI_FRONTEND_VERSION__) && app.menu?.settingsGroup?.element;
+        if (!legacy || !(await addLegacyButton())) {
             app.registerExtension({
                 name: "ComfyUI.ModelHub.Toolbar",
                 actionBarButtons: [{

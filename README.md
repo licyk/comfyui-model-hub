@@ -27,7 +27,7 @@ Restart ComfyUI and refresh the browser. The prestartup script automatically ins
 
 Use the top button or **Tools → Open Model Manager**. The window opens the local library and supports maximize, close, and retry. Hub directories are read when first opened and fixed by ComfyUI; restart after changing ComfyUI path configuration.
 
-The toolbar uses the same native ComfyUI button sizing as comfyui-browser, with a Lucide Package icon. **Open in new tab** is always available in the dialog header, including after startup failure. The new tab starts Hub independently from its own origin before opening the library.
+The toolbar button, with a Lucide Package icon, uses the frontend's action bar on frontend 1.32.4 and newer; older frontends get a legacy top-menu button with the same native sizing as comfyui-browser. **Open in new tab** is always available in the dialog header, including after startup failure. The new tab starts Hub independently from its own origin before opening the library.
 
 Each registered model directory becomes a stable Hub root, deduplicated by resolved path. Default destinations follow ComfyUI's per-category path order. Auxiliary VAE and latent upscaler directories do not replace primary defaults. Unknown extension model categories remain browsable without an assumed model kind. Discovery does not create missing directories. Root locking does not restrict Hub's existing absolute download destinations or server-side imports.
 
@@ -67,7 +67,7 @@ python -m ruff format --check .
 python -m ty check --python /path/to/comfy/python
 node --check js/model_hub.js
 node --check js/dialog.js
-node tests/test_startup.mjs
+node --test tests/*.mjs
 ```
 
 Type checking expects ComfyUI at `../ComfyUI`; otherwise pass `--extra-search-path /path/to/ComfyUI`. Browser tests optionally accept `PLAYWRIGHT_CHROMIUM_EXECUTABLE`.

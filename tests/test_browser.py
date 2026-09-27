@@ -66,46 +66,79 @@ export class ComfyButtonGroup {
 """
 
 
-async def test_button_iframe_close_reopen_retry_and_refresh(tmp_path):
-    model_dir = tmp_path / "models"
-    model_dir.mkdir()
-    loras = model_dir / "loras"
-    loras.mkdir()
-    service = HubService(
-        tmp_path / "data", lambda: collect_model_paths({"loras": ([str(loras)], set())}, model_dir), lambda: None
-    )
-    proxy = HubProxy(service)
+def script(body: str):
+    async def handler(_):
+        return web.Response(text=body, content_type="text/javascript")
+
+    return handler
+
+
+def harness(proxy: HubProxy, frontend_version: str | None = None) -> tuple[web.Application, list[str]]:
+    """A page loading the extension like ComfyUI does; records which legacy modules it imports."""
     app = web.Application()
+    legacy_imports: list[str] = []
+    version = f"<script>window.__COMFYUI_FRONTEND_VERSION__ = {frontend_version!r};</script>" if frontend_version else ""
 
     async def page(_):
         return web.Response(
-            text='<html><body><script type="module" src="/comfy/extensions/model-hub/model_hub.js"></script></body></html>',
+            text=f'<html><body>{version}<script type="module" src="/comfy/extensions/model-hub/model_hub.js"></script></body></html>',
             content_type="text/html",
         )
 
-    async def api_js(_):
-        return web.Response(text=API_JS, content_type="text/javascript")
+    def legacy(body: str):
+        serve = script(body)
 
-    async def app_js(_):
-        return web.Response(text=APP_JS, content_type="text/javascript")
+        async def handler(request):
+            legacy_imports.append(request.path)
+            return await serve(request)
 
-    async def button_js(_):
-        return web.Response(text=BUTTON_JS, content_type="text/javascript")
-
-    async def group_js(_):
-        return web.Response(text=GROUP_JS, content_type="text/javascript")
+        return handler
 
     app.router.add_get("/comfy/", page)
-    app.router.add_get("/comfy/scripts/api.js", api_js)
-    app.router.add_get("/comfy/scripts/app.js", app_js)
-    app.router.add_get("/comfy/scripts/ui/components/button.js", button_js)
-    app.router.add_get("/comfy/scripts/ui/components/buttonGroup.js", group_js)
+    app.router.add_get("/comfy/scripts/api.js", script(API_JS))
+    app.router.add_get("/comfy/scripts/app.js", script(APP_JS))
+    app.router.add_get("/comfy/scripts/ui/components/button.js", legacy(BUTTON_JS))
+    app.router.add_get("/comfy/scripts/ui/components/buttonGroup.js", legacy(GROUP_JS))
     app.router.add_static("/comfy/extensions/model-hub/", Path(__file__).resolve().parents[1] / "js")
     app.router.add_post("/comfy/api/model-hub-extension/start", proxy.start)
     app.router.add_post("/comfy/model-hub-extension/start", proxy.start)
     app.router.add_get("/comfy/model-hub-extension/open", proxy.open_page)
     app.router.add_get("/comfy/model-hub-extension/open.js", proxy.open_script)
     app.router.add_route("*", "/comfy/model-hub/{tail:.*}", proxy.handle)
+    return app, legacy_imports
+
+
+async def test_current_frontends_get_an_action_bar_button_without_legacy_imports(tmp_path):
+    service = HubService(tmp_path / "data", lambda: collect_model_paths({}), lambda: None)
+    proxy = HubProxy(service)
+    app, legacy_imports = harness(proxy, "1.53.6")
+    async with TestServer(app) as server, async_playwright() as playwright:
+        browser = await playwright.chromium.launch(
+            headless=True,
+            executable_path=os.getenv("PLAYWRIGHT_CHROMIUM_EXECUTABLE"),
+            args=["--no-sandbox"],
+        )
+        try:
+            tab = await browser.new_page()
+            await tab.goto(str(server.make_url("/comfy/")))
+            await tab.get_by_role("button", name="Model Manager", exact=True).click()
+            await expect(tab.frame_locator("iframe").get_by_role("navigation", name="Main", exact=True)).to_be_visible(timeout=30000)
+            assert await tab.evaluate("window.hubExtension.name") == "ComfyUI.ModelHub.Toolbar"
+            assert legacy_imports == []
+        finally:
+            await browser.close()
+            await proxy.close()
+            await service.close()
+
+
+async def test_button_iframe_close_reopen_retry_and_refresh(tmp_path):
+    model_dir = tmp_path / "models"
+    model_dir.mkdir()
+    loras = model_dir / "loras"
+    loras.mkdir()
+    service = HubService(tmp_path / "data", lambda: collect_model_paths({"loras": ([str(loras)], set())}, model_dir), lambda: None)
+    proxy = HubProxy(service)
+    app, legacy_imports = harness(proxy)
     async with TestServer(app) as server, async_playwright() as playwright:
         browser = await playwright.chromium.launch(
             headless=True,
@@ -120,6 +153,8 @@ async def test_button_iframe_close_reopen_retry_and_refresh(tmp_path):
             button = tab.get_by_role("button", name="Model Manager", exact=True)
             await expect(button).to_have_text("")
             await expect(button.locator("i")).to_have_class("icon-[lucide--package] comfy-model-hub-icon")
+            # Without a frontend version (older than the action bar API) the legacy toolbar is used.
+            assert len(legacy_imports) == 2
 
             async def html_error(route):
                 await route.fulfill(status=404, content_type="text/html", body="<html><body>Not found</body></html>")
