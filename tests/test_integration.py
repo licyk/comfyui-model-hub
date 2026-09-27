@@ -172,21 +172,14 @@ def same_origin(client) -> dict[str, str]:
     return {"Origin": str(client.make_url("/")).rstrip("/")}
 
 
-async def test_all_folders_start_on_and_stay_off_once_turned_off(hub):
+async def test_all_folders_can_be_pinned_off(hub):
     service, _, client, _, _ = hub
+    service.combined_view = False
     await start(client)
     settings = await (await client.get("/model-hub/api/v1/settings")).json()
-    assert settings["library"]["combined_view"] is True
-    assert "library.combined_view" not in settings["pinned"]
-    response = await client.patch("/model-hub/api/v1/settings", json={"library": {"combined_view": False}}, headers=same_origin(client))
-    assert response.status == 200, await response.text()
+    assert settings["library"]["combined_view"] is False and "library.combined_view" in settings["pinned"]
+    response = await client.patch("/model-hub/api/v1/settings", json={"library": {"combined_view": True}}, headers=same_origin(client))
     assert (await response.json())["library"]["combined_view"] is False
-    # The default is applied once: restarting ComfyUI's Hub keeps the user's choice.
-    await service.close()
-    service._closing = False
-    await start(client)
-    settings = await (await client.get("/model-hub/api/v1/settings")).json()
-    assert settings["library"]["combined_view"] is False
 
 
 async def test_pinned_all_folders_list_every_comfyui_directory_once(hub):
@@ -200,7 +193,6 @@ async def test_pinned_all_folders_list_every_comfyui_directory_once(hub):
     service.paths = lambda: collect_model_paths(
         {"checkpoints": ([str(checkpoints)], set()), "loras": ([str(external)], set())}, models
     )
-    service.combined_view = True
     await start(client)
     settings = await (await client.get("/model-hub/api/v1/settings")).json()
     assert settings["library"]["combined_view"] is True and "library.combined_view" in settings["pinned"]

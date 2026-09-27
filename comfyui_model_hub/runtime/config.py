@@ -16,14 +16,12 @@ def public_base_url() -> str | None:
     return os.getenv("COMFYUI_MODEL_HUB_PUBLIC_BASE_URL") or None
 
 
-def combined_view() -> bool | None:
-    """Pin Hub's "All folders" library entry on or off; unset, it starts on and Hub's settings can change it."""
+def combined_view() -> bool:
+    """Pin Hub's "All folders" library entry: on unless the administrator turns it off."""
     raw = os.getenv("COMFYUI_MODEL_HUB_COMBINED_VIEW", "").strip().lower()
-    if not raw:
-        return None
-    if raw in {"1", "true", "yes", "on"}:
+    if not raw or raw in {"1", "true", "yes", "on"}:
         return True
     if raw in {"0", "false", "no", "off"}:
         return False
     logging.getLogger(LOGGER_NAME).warning("Ignoring COMFYUI_MODEL_HUB_COMBINED_VIEW=%r; use 1 or 0", raw)
-    return None
+    return True
