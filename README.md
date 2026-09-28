@@ -2,6 +2,8 @@
 
 [中文说明](README-zh.md)
 
+A model management and download extension for ComfyUI, powered by [sd-model-hub](https://github.com/licyk/sd-model-hub).
+
 Open [SD Model Hub](https://pypi.org/project/sd-model-hub/) inside ComfyUI using the compact **Lucide Package** toolbar button (tooltip: **Model Manager**). Browse local models, discover online models, download repositories or direct links, and use the original Hub settings interface.
 
 - Closing the window preserves its state and leaves downloads running.

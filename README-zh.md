@@ -1,5 +1,7 @@
 # ComfyUI Model Hub
 
+ComfyUI 的模型管理、下载扩展，由 [sd-model-hub](https://github.com/licyk/sd-model-hub) 驱动。
+
 在 ComfyUI 顶部点击 **Lucide Package** 包裹图标（提示文字“模型管理器”），直接打开 [SD Model Hub](https://pypi.org/project/sd-model-hub/) 的模型库、在线浏览、Hub 仓库、链接下载和设置界面。
 
 - 界面在 ComfyUI 内打开，支持最大化、关闭和重试；关闭窗口不停止下载。
