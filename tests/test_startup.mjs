@@ -34,7 +34,7 @@ for (const [status, body, hint] of [
 }
 
 test("preserves the backend's startup failure", async () => {
-    const response = Response.json({ state: "failed", error: "SD Model Hub's web UI is missing" }, { status: 503 });
+    const response = Response.json({ state: "failed", error: "Hanakura's web UI is missing" }, { status: 503 });
     await assert.rejects(readStartupResponse(response, endpoint, messages), /HTTP 503.*web UI is missing/);
 });
 

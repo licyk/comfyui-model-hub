@@ -1,1 +1,1 @@
-"""SD Model Hub integration for ComfyUI."""
+"""Hanakura integration for ComfyUI."""

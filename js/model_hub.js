@@ -7,7 +7,7 @@ import { readStartupResponse } from "./startup.js";
 const translations = {
     en: {
         title: "Model Manager", maximize: "Maximize", restore: "Restore", close: "Close", retry: "Retry", newTab: "Open in new tab",
-        loading: "Starting SD Model Hub…", failed: "Unable to open Model Manager.",
+        loading: "Starting Hanakura…", failed: "Unable to open Model Manager.",
         unavailable: "The interface did not load. Check the ComfyUI log and retry.",
         framing: "The browser refused to embed the interface. A reverse proxy is sending X-Frame-Options: deny "
             + "or a Content-Security-Policy frame-ancestors rule for this address. Allow same-origin embedding "
@@ -17,12 +17,12 @@ const translations = {
             missing: "The extension startup endpoint was not found. Restart ComfyUI and check its extension loading log and proxy routes.",
             denied: "The startup request was denied or redirected to login. Check authentication and the configured public Hub URL when using a reverse proxy.",
             unexpected: "The request did not return a Hub startup result. Check whether a proxy or frontend page is handling this address.",
-            server: "The backend could not start SD Model Hub. Check the ComfyUI log for the underlying error.",
+            server: "The backend could not start Hanakura. Check the ComfyUI log for the underlying error.",
         },
     },
     zh: {
         title: "模型管理器", maximize: "最大化", restore: "还原", close: "关闭", retry: "重试", newTab: "在新标签页打开",
-        loading: "正在启动 SD Model Hub…", failed: "无法打开模型管理器。",
+        loading: "正在启动 Hanakura…", failed: "无法打开模型管理器。",
         unavailable: "界面未能加载，请检查 ComfyUI 日志后重试。",
         framing: "浏览器拒绝嵌入该界面。反向代理为该地址返回了 X-Frame-Options: deny 或 "
             + "Content-Security-Policy 的 frame-ancestors 限制。请允许同源嵌入"
@@ -32,7 +32,7 @@ const translations = {
             missing: "未找到扩展启动接口。请重启 ComfyUI，并检查扩展加载日志和反向代理路由。",
             denied: "启动请求被拒绝或被重定向到登录页。请检查登录状态；使用反向代理时，请核对配置的 Hub 外部地址。",
             unexpected: "该地址没有返回 Hub 启动结果，请检查请求是否被代理或前端页面接管。",
-            server: "后端未能启动 SD Model Hub，请检查 ComfyUI 日志中的具体错误。",
+            server: "后端未能启动 Hanakura，请检查 ComfyUI 日志中的具体错误。",
         },
     },
 };

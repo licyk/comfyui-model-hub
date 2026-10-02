@@ -41,7 +41,7 @@ class HubService:
     @property
     def upstream(self) -> str:
         if self._hub is None or not self._hub.running:
-            raise RuntimeError("SD Model Hub is not running")
+            raise RuntimeError("Hanakura is not running")
         return self._hub.url
 
     def status(self) -> dict[str, Any]:
@@ -52,7 +52,7 @@ class HubService:
 
     async def ensure_started(self) -> None:
         if self._closing:
-            raise RuntimeError("SD Model Hub is shutting down")
+            raise RuntimeError("Hanakura is shutting down")
         if self.status()["state"] == "ready":
             return
         if self._starting is None or self._starting.done():
@@ -73,22 +73,22 @@ class HubService:
             self.state = "ready"
         except Exception as exc:
             self.state, self.error = "failed", str(exc)
-            logger.exception("Could not start SD Model Hub")
+            logger.exception("Could not start Hanakura")
             raise
 
     def _start_sync(self, paths: ModelPaths) -> None:
-        from sd_model_hub import ModelHubServer, ModelRoot
-        from sd_model_hub.api.static import web_dist_dir
+        from hanakura import HanakuraServer, ModelRoot
+        from hanakura.api.static import web_dist_dir
 
         if self._hub is not None:
             self._hub.stop()
             self._hub = None
         if not (web_dist_dir() / "index.html").is_file():
-            raise RuntimeError("SD Model Hub's web UI is missing. Install its release wheel, or build its web UI first.")
+            raise RuntimeError("Hanakura's web UI is missing. Install its release wheel, or build its web UI first.")
         downloads: dict[str, Any] = {"kind_destinations": paths.destinations}
         if paths.default_download_root is not None:
             downloads["default_root"] = paths.default_download_root
-        self._hub = (self._factory or ModelHubServer)(
+        self._hub = (self._factory or HanakuraServer)(
             data_dir=self.data_dir,
             model_roots=[ModelRoot(**root) for root in paths.roots],
             lock_model_roots=True,

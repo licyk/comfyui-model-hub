@@ -90,7 +90,7 @@ async def test_streaming_headers_cookie_and_redirect_handling(hub):
             "Content-Security-Policy": "default-src 'self'",
         }
         response = web.Response(body=gzip.compress(b"body compressed once"), headers=headers)
-        response.set_cookie("sd_model_hub_oauth", "transaction", path="/model-hub/api/v1/auth/civitai", httponly=True, samesite="Lax")
+        response.set_cookie("hanakura_oauth", "transaction", path="/model-hub/api/v1/auth/civitai", httponly=True, samesite="Lax")
         response.set_cookie("second", "preserved")
         return response
 
@@ -109,7 +109,7 @@ async def test_streaming_headers_cookie_and_redirect_handling(hub):
                 headers={
                     "Authorization": "Bearer external-token",
                     "X-Forwarded-Host": "evil.example",
-                    "Cookie": "comfy_session=private; sd_model_hub_oauth=binding",
+                    "Cookie": "comfy_session=private; hanakura_oauth=binding",
                 },
             )
             assert await response.text() == "body compressed once"
@@ -119,7 +119,7 @@ async def test_streaming_headers_cookie_and_redirect_handling(hub):
             assert response.headers.getall("Content-Security-Policy") == ["default-src 'self'", "frame-ancestors 'self'"]
             assert captured[0]["Authorization"] == "Bearer " + service.token
             assert "X-Forwarded-Host" not in captured[0]
-            assert captured[0]["Cookie"] == "sd_model_hub_oauth=binding"
+            assert captured[0]["Cookie"] == "hanakura_oauth=binding"
             response = await client.get("/api/model-hub/redirect", allow_redirects=False)
             assert response.status == 307
             assert response.headers["Location"] == "/api/model-hub/destination"

@@ -1,8 +1,8 @@
 # ComfyUI Model Hub
 
-ComfyUI 的模型管理、下载扩展，由 [sd-model-hub](https://github.com/licyk/sd-model-hub) 驱动。
+ComfyUI 的模型管理、下载扩展，由 [Hanakura](https://github.com/licyk/Hanakura) 驱动。
 
-在 ComfyUI 顶部点击 **Lucide Package** 包裹图标（提示文字“模型管理器”），直接打开 [SD Model Hub](https://pypi.org/project/sd-model-hub/) 的模型库、在线浏览、Hub 仓库、链接下载和设置界面。
+在 ComfyUI 顶部点击 **Lucide Package** 包裹图标（提示文字“模型管理器”），直接打开 [Hanakura](https://pypi.org/project/hanakura/) 的模型库、在线浏览、Hub 仓库、链接下载和设置界面。
 
 - 界面在 ComfyUI 内打开，支持最大化、关闭和重试；关闭窗口不停止下载。
 - 自动接入 ComfyUI 已注册的模型目录，包括 `extra_model_paths.yaml`、自定义模型路径、旧 `clip` / `unet` 目录和其他扩展注册的模型目录。
@@ -39,7 +39,7 @@ git clone https://github.com/licyk/comfyui-model-hub.git custom_nodes/comfyui-mo
 <ComfyUI user 目录>/__model_hub/
 ```
 
-这会遵循 ComfyUI 的自定义 user 目录设置，不会写入扩展目录或占用独立 SD Model Hub 的默认数据目录。依赖自动安装失败时可查看启动日志排查原因；Hub 启动失败时窗口会显示原因并允许重试。
+这会遵循 ComfyUI 的自定义 user 目录设置，不会写入扩展目录或占用独立 Hanakura 的默认数据目录。依赖自动安装失败时可查看启动日志排查原因；Hub 启动失败时窗口会显示原因并允许重试。
 
 打开失败时，窗口会显示启动请求的 HTTP 状态码和路径。404 / 405 表示需要检查扩展后端是否加载及代理路由；401 / 403 表示需要检查访问权限或外部地址配置；200 但没有 Hub 启动结果通常表示返回了登录页或前端 HTML。更新扩展后需重启 ComfyUI，并强制刷新浏览器，避免继续加载旧的 JavaScript。
 
@@ -93,6 +93,6 @@ node --test tests/*.mjs
 
 ty 默认从相邻的 `../ComfyUI` 解析宿主接口；不同目录布局请用 `--extra-search-path /path/to/ComfyUI`。浏览器测试可通过 `PLAYWRIGHT_CHROMIUM_EXECUTABLE` 使用已有 Chromium。
 
-集成测试运行真实 sd-model-hub 发行包、aiohttp 代理及本地下载源，模型和数据放在临时目录。浏览器测试使用真实 Chromium 和 Hub 页面，以及模拟 ComfyUI 扩展注册接口的小型宿主，不代表完整 ComfyUI 前端或 GPU 工作流验证。
+集成测试运行真实 Hanakura 发行包、aiohttp 代理及本地下载源，模型和数据放在临时目录。浏览器测试使用真实 Chromium 和 Hub 页面，以及模拟 ComfyUI 扩展注册接口的小型宿主，不代表完整 ComfyUI 前端或 GPU 工作流验证。
 
 本项目采用 [GPL-3.0-only](LICENSE) 协议。

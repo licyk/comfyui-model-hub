@@ -2,7 +2,7 @@ import asyncio
 import threading
 
 import pytest
-from sd_model_hub import ModelHubServer
+from hanakura import HanakuraServer
 
 
 async def test_failed_start_can_be_retried(hub):
@@ -30,7 +30,7 @@ async def test_disconnected_start_request_and_shutdown_leave_no_server(hub):
     def delayed(**options):
         entered.set()
         assert proceed.wait(5)
-        instance = ModelHubServer(**options)
+        instance = HanakuraServer(**options)
         instances.append(instance)
         return instance
 

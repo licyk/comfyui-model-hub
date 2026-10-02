@@ -7,7 +7,7 @@ if (/\/model-hub-extension\/open$/.test(window.location.pathname)) {
     retry.textContent = chinese ? "重试" : "Retry";
     async function start() {
         retry.hidden = true;
-        status.textContent = chinese ? "正在启动 SD Model Hub…" : "Starting SD Model Hub…";
+        status.textContent = chinese ? "正在启动 Hanakura…" : "Starting Hanakura…";
         try {
             const response = await fetch(endpoint, { method: "POST", credentials: "same-origin" });
             const body = await response.text();

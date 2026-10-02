@@ -77,10 +77,10 @@ class HubProxy:
         # Navigation may originate in a sandboxed/embedded ComfyUI. Do not start the
         # service here: the page's POST still goes through the normal origin check.
         page = """<!doctype html><html><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1"><title>SD Model Hub</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>Hanakura</title>
 <style>body{font:16px system-ui;margin:3rem;line-height:1.6;color-scheme:light dark}
 button{font:inherit;padding:.4rem 1rem}p{white-space:pre-wrap}</style></head><body>
-<h1>SD Model Hub</h1><p id="status" role="status"></p><button id="retry" hidden></button>
+<h1>Hanakura</h1><p id="status" role="status"></p><button id="retry" hidden></button>
 <script type="module" src="open.js"></script></body></html>"""
         return web.Response(
             text=page,
@@ -118,7 +118,7 @@ button{font:inherit;padding:.4rem 1rem}p{white-space:pre-wrap}</style></head><bo
     async def handle(self, request: web.Request) -> web.StreamResponse:
         self.validate(request)
         if self.service.status()["state"] != "ready":
-            return web.json_response({"error": "Open the model manager to start SD Model Hub", **self.service.status()}, status=503)
+            return web.json_response({"error": "Open the model manager to start Hanakura", **self.service.status()}, status=503)
         upstream = self.service.upstream
         # Use the raw path to preserve encoded filenames. The destination origin is always ours.
         raw = request.rel_url.raw_path
@@ -139,9 +139,9 @@ button{font:inherit;padding:.4rem 1rem}p{white-space:pre-wrap}</style></head><bo
         headers["Host"] = url.raw_authority
         headers["Origin"] = str(url.origin())
         headers["Authorization"] = "Bearer " + self.service.token
-        if "sd_model_hub_oauth" in request.cookies:
+        if "hanakura_oauth" in request.cookies:
             cookie: SimpleCookie = SimpleCookie()
-            cookie["sd_model_hub_oauth"] = request.cookies["sd_model_hub_oauth"]
+            cookie["hanakura_oauth"] = request.cookies["hanakura_oauth"]
             headers["Cookie"] = cookie.output(header="").strip()
         try:
             if request.headers.get("Upgrade", "").lower() == "websocket":
@@ -151,8 +151,8 @@ button{font:inherit;padding:.4rem 1rem}p{white-space:pre-wrap}</style></head><bo
             if isinstance(exc.__cause__, web.HTTPRequestEntityTooLarge):
                 raise exc.__cause__
             # Exception messages can contain OAuth query parameters; keep them out of logs.
-            logger.warning("SD Model Hub connection interrupted")
-            return web.json_response({"error": "SD Model Hub connection failed; reopen the model manager to retry"}, status=502)
+            logger.warning("Hanakura connection interrupted")
+            return web.json_response({"error": "Hanakura connection failed; reopen the model manager to retry"}, status=502)
 
     async def _http(self, request: web.Request, url: URL, headers: CIMultiDict[str]) -> web.StreamResponse:
         limit = request.client_max_size

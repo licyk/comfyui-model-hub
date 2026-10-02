@@ -1,4 +1,4 @@
-sd-model-hub>=0.1.16
+hanakura>=0.1.0
 aiohttp
 multidict
 yarl

@@ -17,10 +17,10 @@ def setup_model_hub() -> None:
     if os.getenv("COMFYUI_MODEL_HUB_AUTO_INSTALL", "1").lower() in {"0", "false", "no"}:
         logger.info("Automatic dependency installation is disabled")
         return
-    logger.info("Checking SD Model Hub requirements")
+    logger.info("Checking Hanakura requirements")
     if not validate_requirements(REQUIREMENTS_PATH):
         run_cmd([sys.executable, "-m", "pip", "install", "-r", str(REQUIREMENTS_PATH)], shell=False)
         importlib.invalidate_caches()
         if not validate_requirements(REQUIREMENTS_PATH):
-            raise RuntimeError("SD Model Hub requirements are still incomplete; check the pip output above")
-    logger.info("Checking SD Model Hub requirements done")
+            raise RuntimeError("Hanakura requirements are still incomplete; check the pip output above")
+    logger.info("Checking Hanakura requirements done")
