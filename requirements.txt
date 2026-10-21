@@ -1,4 +1,4 @@
-hanakura>=0.1.7
+hanakura>=0.1.8
 aiohttp
 multidict
 yarl
